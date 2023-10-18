@@ -50,10 +50,13 @@ func benchmark(conn clickhouse.Conn) error {
 }
 
 func main() {
+
+	port := 30934
+	host := "10.15.162.151"
 	var (
-		ctx       = context.Background()
+		// ctx       = context.Background()
 		conn, err = clickhouse.Open(&clickhouse.Options{
-			Addr: []string{"127.0.0.1:9000"},
+			Addr: []string{fmt.Sprintf("%s:%d", host, port)},
 			Auth: clickhouse.Auth{
 				Database: "default",
 				Username: "default",
@@ -61,20 +64,20 @@ func main() {
 			},
 			//Debug:           true,
 			DialTimeout:     time.Second,
-			MaxOpenConns:    10,
-			MaxIdleConns:    5,
+			MaxOpenConns:    100,
+			MaxIdleConns:    50,
 			ConnMaxLifetime: time.Hour,
 		})
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := conn.Exec(ctx, "DROP TABLE IF EXISTS benchmark_async"); err != nil {
-		log.Fatal(err)
-	}
-	if err := conn.Exec(ctx, ddl); err != nil {
-		log.Fatal(err)
-	}
+	// if err := conn.Exec(ctx, "DROP TABLE IF EXISTS benchmark_async"); err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if err := conn.Exec(ctx, ddl); err != nil {
+	// 	log.Fatal(err)
+	// }
 	start := time.Now()
 	if err := benchmark(conn); err != nil {
 		log.Fatal(err)
